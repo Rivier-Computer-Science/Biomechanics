@@ -1,0 +1,48 @@
+# Project Configuration
+
+# Data settings
+data:
+  raw_dir: "../data/raw"
+  processed_dir: "../data/processed"
+  labeled_dir: "../data/labeled"
+  
+  # Video processing
+  video:
+    fps: 30
+    resolution: [1280, 720]
+    formats: [".mp4", ".avi", ".mov"]
+  
+  # Pose settings
+  pose:
+    model: "mediapipe"  # Options: mediapipe, openpose
+    confidence_threshold: 0.5
+    landmarks_format: "json"
+
+# Model settings
+model:
+  type: "lstm"
+  sequence_length: 60  # Number of frames per sequence
+  hidden_units: 128
+  dropout: 0.3
+  learning_rate: 0.001
+  batch_size: 32
+  epochs: 100
+  
+# Feature engineering
+features:
+  normalize: true
+  angles:
+    - "elbow"      # shoulder–elbow–wrist
+    - "knee"       # hip–knee–ankle
+    - "shoulder"   # torso–shoulder–elbow
+  calculate_velocity: true
+  calculate_acceleration: false
+  smoothing: "savgol"  # Savitzky-Golay filter
+  
+# Visualization
+visualization:
+  skeleton_color: [0, 255, 0]  # Green
+  incorrect_color: [255, 0, 0]  # Red
+  correct_color: [0, 255, 0]   # Green
+  font_size: 1
+  line_thickness: 2

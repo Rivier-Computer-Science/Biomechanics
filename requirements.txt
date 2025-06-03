@@ -1,0 +1,28 @@
+# Core packages
+numpy==1.24.3
+pandas==2.0.2
+matplotlib==3.7.1
+opencv-python==4.7.0.72
+scikit-learn==1.2.2
+
+# Deep learning
+tensorflow==2.12.0
+torch==2.0.1
+torchvision==0.15.2
+
+# Pose estimation
+mediapipe==0.10.0
+
+# Utilities
+tqdm==4.65.0
+pillow==9.5.0
+jupyter==1.0.0
+ipykernel==6.23.1
+
+# Visualization
+seaborn==0.12.2
+plotly==5.14.1
+
+# For web deployment (future)
+# flask==2.3.2
+# fastapi==0.95.2
