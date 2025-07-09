@@ -2,8 +2,8 @@
 
 # Data settings
 data:
-  raw_dir: "../data/raw"
-  processed_dir: "../data/processed"
+  raw_dir: "../raw"
+  processed_dir: "../processed"
   labeled_dir: "../data/labeled"
   
   # Video processing
@@ -21,12 +21,12 @@ data:
 # Model settings
 model:
   type: "lstm"
-  sequence_length: 60  # Number of frames per sequence
-  hidden_units: 128
-  dropout: 0.3
-  learning_rate: 0.001
-  batch_size: 32
-  epochs: 100
+  sequence_length: 1  # Number of frames per sequence (1 for images)
+  hidden_units: 128  # Increased back for larger dataset
+  dropout: 0.3   # Standard dropout rate
+  learning_rate: 0.001  # Standard learning rate
+  batch_size: 32  # Standard batch size for larger dataset
+  epochs: 50   # More epochs for larger dataset
   
 # Feature engineering
 features:

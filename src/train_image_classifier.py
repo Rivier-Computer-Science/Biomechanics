@@ -93,52 +93,53 @@ def parse_args():
     return parser.parse_args()
 
 
-def extract_poses(config, data_dir, pose_dir, visualize=False, subset=None):
+def extract_poses(config_path, data_dir, pose_dir, visualize=False, subset=None):
     """Extract poses from images."""
     print("Extracting poses from images...")
     
-    # Create pose extractor
-    extractor = ImagePoseExtractor(
-        model_complexity=config.get('pose_estimation', {}).get('model_complexity', 1),
-        min_detection_confidence=config.get('pose_estimation', {}).get('min_detection_confidence', 0.5),
-        min_tracking_confidence=config.get('pose_estimation', {}).get('min_tracking_confidence', 0.5)
-    )
+    # Create pose extractor with config file path
+    extractor = ImagePoseExtractor(config_path)
     
     # Process the dataset
-    extractor.process_dataset(
+    all_metadata = extractor.process_dataset(
         dataset_dir=data_dir,
         output_dir=pose_dir,
-        visualize=visualize,
-        subset=subset
+        file_extensions=['.png', '.jpg', '.jpeg'],
+        limit_per_class=subset
     )
     
     print(f"Poses extracted and saved to {pose_dir}")
+    print(f"Processed {len(all_metadata)} images")
 
 
-def prepare_dataset(config, pose_dir, features_dir):
+def prepare_dataset(config_path, pose_dir, features_dir):
     """Prepare the dataset for training."""
     print("Preparing dataset...")
     
     # Create dataset preparer
-    preparer = CricketShotDatasetPreparer(config)
+    preparer = CricketShotDatasetPreparer(config_path)
     
     # Process pose data
-    features_df = preparer.process_pose_files(pose_dir)
+    metadata_path = os.path.join(pose_dir, "dataset_metadata.json")
+    processed_metadata = preparer.process_pose_files(metadata_path, features_dir)
     
-    # Save combined features
-    os.makedirs(features_dir, exist_ok=True)
-    features_path = os.path.join(features_dir, "combined_features.csv")
-    features_df.to_csv(features_path, index=False)
-    print(f"Combined features saved to {features_path}")
+    # Combine features
+    combined_features_path = os.path.join(features_dir, "combined_features.csv")
+    combined_df = preparer.combine_features(processed_metadata, combined_features_path)
     
     # Prepare train/val/test splits
-    train_df, val_df, test_df = preparer.prepare_train_test_split(features_df)
+    train_df, val_df, test_df = preparer.prepare_train_test_split(combined_df)
     
     # Save splits
     splits_dir = os.path.join(features_dir, "splits")
-    preparer.save_splits(train_df, val_df, test_df, splits_dir)
+    paths = preparer.save_splits(train_df, val_df, test_df, splits_dir)
     
-    return train_df, val_df, test_df, preparer.class_mapping
+    # Load class mapping
+    class_mapping_path = os.path.join(splits_dir, "class_mapping.json")
+    with open(class_mapping_path, 'r') as f:
+        class_mapping = json.load(f)
+    
+    return train_df, val_df, test_df, class_mapping
 
 
 def train_model(config, train_df, val_df, output_dir, model_name, class_mapping):
@@ -291,10 +292,10 @@ def main():
     
     # Extract poses if requested
     if args.extract_poses:
-        extract_poses(config, args.data_dir, args.pose_dir, args.visualize, args.subset)
+        extract_poses(args.config, args.data_dir, args.pose_dir, args.visualize, args.subset)
     
     # Prepare dataset
-    train_df, val_df, test_df, class_mapping = prepare_dataset(config, args.pose_dir, args.features_dir)
+    train_df, val_df, test_df, class_mapping = prepare_dataset(args.config, args.pose_dir, args.features_dir)
     
     # Train model
     classifier, history = train_model(config, train_df, val_df, args.output_dir, args.model_name, class_mapping)

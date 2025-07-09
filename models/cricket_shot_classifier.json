@@ -1,0 +1,16 @@
+{
+  "classes": [
+    "drive",
+    "legglance-flick",
+    "pullshot",
+    "sweep"
+  ],
+  "class_mapping": {
+    "drive": 0,
+    "legglance-flick": 1,
+    "pullshot": 2,
+    "sweep": 3
+  },
+  "input_size": 6,
+  "num_classes": 4
+}
