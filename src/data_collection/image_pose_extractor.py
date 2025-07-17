@@ -42,9 +42,9 @@ class ImagePoseExtractor:
         self.mp_drawing = mp.solutions.drawing_utils
         self.pose = self.mp_pose.Pose(
             static_image_mode=True,  # Set to True for images
-            model_complexity=2,
-            min_detection_confidence=self.config['data']['pose'].get('confidence_threshold', 0.5),
-            min_tracking_confidence=0.5
+            model_complexity=1,  # Reduced complexity for better detection
+            min_detection_confidence=0.3,  # Lower confidence threshold
+            min_tracking_confidence=0.3
         )
     
     def process_image(self, image_path, output_dir=None, visualize=False):
@@ -70,6 +70,8 @@ class ImagePoseExtractor:
         if image is None:
             raise ValueError(f"Failed to open image file: {image_path}")
         
+        print(f"Image loaded: {image.shape}")
+        
         # Prepare output
         pose_data = {
             'image_name': image_path.name,
@@ -78,7 +80,10 @@ class ImagePoseExtractor:
         
         # Convert to RGB for MediaPipe
         rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        print(f"RGB image shape: {rgb_image.shape}")
+        
         results = self.pose.process(rgb_image)
+        print(f"MediaPipe results: {results.pose_landmarks is not None}")
         
         if results.pose_landmarks:
             # Convert landmarks to list

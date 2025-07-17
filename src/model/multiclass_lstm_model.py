@@ -141,12 +141,15 @@ class CricketShotClassifier:
             dropout_rate=model_config.get('dropout', 0.3)
         ).to(self.device)
         
-        self.optimizer = optim.Adam(
+        # Use AdamW optimizer with weight decay for better regularization
+        self.optimizer = optim.AdamW(
             self.model.parameters(),
-            lr=model_config.get('learning_rate', 0.001)
+            lr=model_config.get('learning_rate', 0.001),
+            weight_decay=1e-4
         )
         
-        self.criterion = nn.CrossEntropyLoss()
+        # Use Label Smoothing for better generalization
+        self.criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
         
         return self.model
     
@@ -168,6 +171,32 @@ class CricketShotClassifier:
         self.label_encoder.fit(list(self.class_mapping.keys()))
         
         return self.class_mapping
+    
+    def prepare_data(self, train_df, val_df=None, label_col='class', sequence_length=None):
+        """
+        Prepare training and validation data for the LSTM model.
+        
+        Args:
+            train_df (pd.DataFrame): Training dataframe
+            val_df (pd.DataFrame): Validation dataframe
+            label_col (str): Column name for labels
+            sequence_length (int): Length of sequences
+            
+        Returns:
+            tuple: (X_train, y_train, X_val, y_val)
+        """
+        if sequence_length is None:
+            sequence_length = self.config['model'].get('sequence_length', 1)
+        
+        # Prepare training data
+        X_train, y_train = self.prepare_sequences(train_df, label_col, sequence_length)
+        
+        # Prepare validation data if provided
+        if val_df is not None:
+            X_val, y_val = self.prepare_sequences(val_df, label_col, sequence_length)
+            return X_train, y_train, X_val, y_val
+        else:
+            return X_train, y_train
     
     def prepare_sequences(self, features_df, label_col='class', seq_length=None):
         """
@@ -260,6 +289,17 @@ class CricketShotClassifier:
         batch_size = self.config['model'].get('batch_size', 32)
         epochs = self.config['model'].get('epochs', 100)
         
+        # Add learning rate scheduler
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+            self.optimizer, mode='min', factor=0.5, patience=5, verbose=True
+        )
+        
+        # Early stopping parameters
+        best_val_loss = float('inf')
+        patience = 10
+        patience_counter = 0
+        best_model_state = None
+        
         # Training history
         history = {
             'train_loss': [],
@@ -290,6 +330,10 @@ class CricketShotClassifier:
                 # Backward pass and optimize
                 self.optimizer.zero_grad()
                 loss.backward()
+                
+                # Gradient clipping to prevent exploding gradients
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+                
                 self.optimizer.step()
                 
                 # Track loss and accuracy
@@ -328,10 +372,32 @@ class CricketShotClassifier:
                 history['val_loss'].append(avg_val_loss)
                 history['val_acc'].append(val_accuracy)
                 
-                print(f'Epoch [{epoch+1}/{epochs}], Train Loss: {avg_train_loss:.4f}, Train Acc: {train_accuracy:.4f}, '
-                      f'Val Loss: {avg_val_loss:.4f}, Val Acc: {val_accuracy:.4f}')
+                # Learning rate scheduling
+                scheduler.step(avg_val_loss)
+                
+                # Early stopping check
+                if avg_val_loss < best_val_loss:
+                    best_val_loss = avg_val_loss
+                    patience_counter = 0
+                    best_model_state = self.model.state_dict().copy()
+                    print(f'Epoch [{epoch+1}/{epochs}], Train Loss: {avg_train_loss:.4f}, Train Acc: {train_accuracy:.4f}, '
+                          f'Val Loss: {avg_val_loss:.4f}, Val Acc: {val_accuracy:.4f} *** NEW BEST ***')
+                else:
+                    patience_counter += 1
+                    print(f'Epoch [{epoch+1}/{epochs}], Train Loss: {avg_train_loss:.4f}, Train Acc: {train_accuracy:.4f}, '
+                          f'Val Loss: {avg_val_loss:.4f}, Val Acc: {val_accuracy:.4f}')
+                
+                # Early stopping
+                if patience_counter >= patience:
+                    print(f'Early stopping at epoch {epoch+1}')
+                    break
             else:
                 print(f'Epoch [{epoch+1}/{epochs}], Train Loss: {avg_train_loss:.4f}, Train Acc: {train_accuracy:.4f}')
+        
+        # Load best model if early stopping was triggered
+        if best_model_state is not None:
+            self.model.load_state_dict(best_model_state)
+            print("Loaded best model from early stopping")
         
         return history
     
@@ -445,6 +511,16 @@ class CricketShotClassifier:
         # Add class mapping if available
         if self.class_mapping is not None:
             metadata['class_mapping'] = self.class_mapping
+        
+        # Add model architecture information
+        if self.model is not None:
+            # Get input size from the model
+            if hasattr(self.model, 'lstm'):
+                metadata['input_size'] = self.model.lstm.input_size
+            
+            # Get number of classes from the model
+            if hasattr(self.model, 'fc2'):
+                metadata['num_classes'] = self.model.fc2.out_features
         
         # Save metadata
         metadata_path = Path(model_path).with_suffix('.json')

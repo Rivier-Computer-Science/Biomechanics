@@ -1,0 +1,2 @@
+frame_idx,timestamp,left_elbow_angle,right_elbow_angle,left_knee_angle,right_knee_angle,left_shoulder_angle,right_shoulder_angle,class
+0,0,29.66721873513683,3.8292085806482477,136.18299398341873,101.16274094048771,48.27090892357269,16.795989312456694,drive
