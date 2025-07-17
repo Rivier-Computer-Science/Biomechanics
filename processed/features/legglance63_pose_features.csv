@@ -1,0 +1,2 @@
+frame_idx,timestamp,left_elbow_angle,right_elbow_angle,left_knee_angle,right_knee_angle,left_shoulder_angle,right_shoulder_angle,class
+0,0,19.701418513959737,55.06968487371216,94.2810599982504,91.10826483476025,63.93066031124042,97.91578202260354,legglance-flick

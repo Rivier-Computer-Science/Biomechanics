@@ -167,24 +167,68 @@ class CricketShotDatasetPreparer:
         if 'class' not in features_df.columns:
             raise ValueError("Class column not found in features dataframe")
         
-        # First split: training + validation vs test
-        train_val_df, test_df = train_test_split(
-            features_df,
-            test_size=test_size,
-            stratify=features_df['class'],
-            random_state=random_state
-        )
+        # Check if we have enough samples for splitting
+        class_counts = features_df['class'].value_counts()
+        min_samples = class_counts.min()
+        num_classes = len(class_counts)
         
-        # Second split: training vs validation
-        # Adjust validation size to account for the first split
-        adjusted_val_size = val_size / (1 - test_size)
+        print(f"Class distribution: {class_counts.to_dict()}")
+        print(f"Minimum samples per class: {min_samples}")
+        print(f"Number of classes: {num_classes}")
         
-        train_df, val_df = train_test_split(
-            train_val_df,
-            test_size=adjusted_val_size,
-            stratify=train_val_df['class'],
-            random_state=random_state
-        )
+        # Calculate minimum required samples for splitting
+        min_test_samples = max(1, int(test_size * len(features_df) / num_classes))
+        min_val_samples = max(1, int(val_size * len(features_df) / num_classes))
+        min_required = min_test_samples + min_val_samples + 1  # +1 for training
+        
+        print(f"Minimum required samples per class: {min_required}")
+        
+        # Check if we can do stratified split
+        total_samples = len(features_df)
+        test_samples = int(test_size * total_samples)
+        val_samples = int(val_size * total_samples / (1 - test_size))
+        
+        print(f"Total samples: {total_samples}")
+        print(f"Test samples needed: {test_samples}")
+        print(f"Val samples needed: {val_samples}")
+        
+        # Need at least as many samples as classes for stratified split
+        if min_samples < min_required or test_samples < num_classes or val_samples < num_classes:
+            print(f"WARNING: Not enough samples for proper splitting. Using simple split without stratification.")
+            # Use simple random split without stratification
+            train_val_df, test_df = train_test_split(
+                features_df,
+                test_size=test_size,
+                random_state=random_state
+            )
+            
+            # Adjust validation size to account for the first split
+            adjusted_val_size = val_size / (1 - test_size)
+            
+            train_df, val_df = train_test_split(
+                train_val_df,
+                test_size=adjusted_val_size,
+                random_state=random_state
+            )
+        else:
+            # Use stratified split as originally intended
+            train_val_df, test_df = train_test_split(
+                features_df,
+                test_size=test_size,
+                stratify=features_df['class'],
+                random_state=random_state
+            )
+            
+            # Second split: training vs validation
+            # Adjust validation size to account for the first split
+            adjusted_val_size = val_size / (1 - test_size)
+            
+            train_df, val_df = train_test_split(
+                train_val_df,
+                test_size=adjusted_val_size,
+                stratify=train_val_df['class'],
+                random_state=random_state
+            )
         
         return train_df, val_df, test_df
     
@@ -221,9 +265,9 @@ class CricketShotDatasetPreparer:
             json.dump(class_mapping, f, indent=2)
         
         paths = {
-            'train': str(train_path),
-            'val': str(val_path),
-            'test': str(test_path),
+            'train_path': str(train_path),
+            'val_path': str(val_path),
+            'test_path': str(test_path),
             'class_mapping': str(mapping_path)
         }
         
