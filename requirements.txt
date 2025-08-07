@@ -26,3 +26,23 @@ plotly==5.14.1
 # For web deployment (future)
 # flask==2.3.2
 # fastapi==0.95.2
+# API-specific requirements for Cricket Shot Classification API
+
+# Web framework
+flask==2.3.2
+werkzeug==2.3.6
+
+# Request handling
+requests==2.31.0
+
+# File handling and validation
+pillow==9.5.0
+
+# Additional utilities for API
+python-multipart==0.0.6
+gunicorn==20.1.0  # For production deployment
+
+# Development and testing
+pytest==7.4.0
+#pytest-flask==1.2.1
+coverage==7.2.7
