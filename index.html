@@ -3,434 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cricket Shot Classification - Portfolio</title>
+    <title>Cricket Shot Classification - Lokesh Nuvvula Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f8f8f8;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #1a1a1a;
+            color: #e5e7eb;
+            scroll-behavior: smooth;
+            margin: 0;
         }
-        
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 20px;
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background-color: #2d2d2d;
+            padding: 2rem 1.5rem;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
         }
-        
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
+        .sidebar-hidden {
+            transform: translateX(-250px);
         }
-        
-        header h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1100;
+            background-color: #2dd4bf;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 6px;
         }
-        
-        header .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        .sidebar .nav-link {
+            color: #e5e7eb;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            display: block;
+            border-radius: 6px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            cursor: pointer;
         }
-        
-        section {
-            background-color: white;
-            margin-bottom: 2rem;
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: #2dd4bf;
+            color: #1a1a1a;
+        }
+        .main-content {
+            margin-left: 270px;
             padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        
-        h2 {
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #3498db;
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-250px);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
         }
-        
-        h3 {
-            color: #34495e;
-            margin-top: 1.5rem;
-            margin-bottom: 0.8rem;
+        .content-section {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
-        
-        .intro {
-            font-size: 1.1rem;
-            line-height: 1.8;
+        .content-section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .section-title {
+            color: #2dd4bf;
+            font-weight: 700;
+            font-size: 2.5rem;
             margin-bottom: 1.5rem;
         }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
+        .text-muted {
+            color: #9ca3af !important;
+            font-weight: 300;
         }
-        
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border: 1px solid #ddd;
+        .btn-primary {
+            background-color: #2dd4bf;
+            border-color: #2dd4bf;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            color: #1a1a1a;
         }
-        
-        th {
-            background-color: #3498db;
-            color: white;
-            font-weight: 600;
+        .btn-primary:hover {
+            background-color: #14b8a6;
+            border-color: #14b8a6;
         }
-        
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        
-        .task-list {
-            margin: 1rem 0;
-        }
-        
-        .task-item {
-            padding: 0.8rem;
-            margin-bottom: 0.8rem;
-            background-color: #f7f7f7;
-            border-left: 4px solid #3498db;
-        }
-        
-        .task-item strong {
-            color: #2c3e50;
-            display: block;
-            margin-bottom: 0.3rem;
-        }
-        
-        .screenshot {
-            margin: 1.5rem 0;
-            text-align: center;
-        }
-        
-        .screenshot img {
-            max-width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .screenshot-caption {
-            margin-top: 0.5rem;
-            font-style: italic;
-            color: #666;
-        }
-        
-        .code-links {
-            display: flex;
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 0.8rem 1.5rem;
-            background-color: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-        
-        .btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .btn-secondary {
-            background-color: #95a5a6;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #7f8c8d;
-        }
-        
-        .tech-stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin: 1rem 0;
-        }
-        
-        .tech-item {
-            padding: 0.4rem 0.8rem;
-            background-color: #ecf0f1;
-            border-radius: 4px;
+        .tech-tag {
+            background-color: #2dd4bf;
+            color: #1a1a1a;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
             font-size: 0.9rem;
-        }
-        
-        .metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        
-        .metric-card {
-            padding: 1rem;
-            background-color: #f7f7f7;
-            border-radius: 4px;
-            text-align: center;
-        }
-        
-        .metric-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #3498db;
-        }
-        
-        .metric-label {
-            color: #666;
-            margin-top: 0.3rem;
-        }
-        
-        .commit-summary {
-            background-color: #f7f7f7;
-            padding: 1rem;
-            border-radius: 4px;
-            margin: 1rem 0;
-        }
-        
-        .appendix {
-            background-color: #ecf0f1;
-        }
-        
-        .appendix-link {
-            color: #3498db;
-            text-decoration: none;
+            margin: 0.3rem;
+            display: inline-block;
             font-weight: 500;
         }
-        
-        .appendix-link:hover {
-            text-decoration: underline;
+        .table-dark {
+            --bs-table-bg: #3f3f3f;
+            --bs-table-color: #e5e7eb;
+            width: 100%;
+            height: calc(100vh - 150px); /* Full height minus title and margins */
         }
-        
-        footer {
-            text-align: center;
-            padding: 2rem 0;
-            color: #666;
+        .table-dark th {
+            background-color: #2dd4bf;
+            color: #1a1a1a;
+            font-weight: 600;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            section {
-                padding: 1.5rem;
-            }
-            
-            .code-links {
-                flex-direction: column;
-            }
+        .table-dark tbody tr:last-child td {
+            padding-bottom: 1rem; /* Margin below last record */
+        }
+        .table-dark td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        .list-unstyled li {
+            margin-bottom: 1rem;
+            font-weight: 400;
+        }
+        .list-unstyled li strong {
+            font-weight: 600;
+        }
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #2dd4bf;
+        }
+        .overview-header {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #e5e7eb;
+            margin-bottom: 1rem;
+        }
+        .overview-subheader {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #2dd4bf;
+            margin-bottom: 1.5rem;
+        }
+        .overview-text {
+            font-size: 1.1rem;
+            font-weight: 400;
+            line-height: 1.8;
+        }
+        .pre-code {
+            background-color: #3f3f3f;
+            border-radius: 6px;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #d1d5db;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Cricket Shot Classification System</h1>
-            <div class="subtitle">Image-Based Biomechanical Analysis Using Deep Learning</div>
+    <!-- Sidebar -->
+    <button class="sidebar-toggle d-lg-none" onclick="toggleSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+            <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+        </svg>
+    </button>
+    <nav class="sidebar">
+        <div class="text-center mb-4">
+            <img src="data:image/jpeg;base64,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" alt="Profile Picture" class="profile-img mb-3">
+            <h6 class="fw-bold text-white">Lokesh Nuvvula</h3>
+            <p class="text-muted small">Computer Science Enthusiast</p>
+            <p class="text-muted small">GitHub: <a href="https://github.com/Rivier-Computer-Science/Biomechanics" class="text-primary">Rivier-Computer-Science</a></p>
         </div>
-    </header>
-    
-    <div class="container">
-        <!-- Project Overview -->
-        <section>
-            <h2>Project Overview</h2>
-            <div class="intro">
-                I built an automated system that classifies cricket shots from static images using computer vision and deep learning. My primary contributions included implementing the MediaPipe pose extraction pipeline, developing the LSTM-based classifier, and creating the feature engineering module that calculates biomechanical joint angles from pose landmarks. The system processes over 4,500 cricket images across four shot types with 92% classification accuracy.
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link active" onclick="showSection('overview')">Overview</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="showSection('timeline')">Timeline</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="showSection('implementation')">Implementation</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="showSection('stack')">Tech Stack</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="showSection('code')">Code</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="showSection('results')">Results</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="showSection('appendix')">Appendix</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Overview -->
+        <section id="overview" class="content-section active">
+            <h1 class="overview-header">Cricket Shot Classification</h1>
+            <h2 class="overview-subheader">About Me & My Capabilities</h2>
+            <p class="overview-text text-gray-300 mb-4">
+                I'm Lokesh Nuvvula, a computer science professional skilled in machine learning and computer vision, as demonstrated in the Cricket Shot Classification project. My expertise lies in developing robust data pipelines and neural network models, evidenced by my implementation of a MediaPipe-based pose extraction system and an LSTM classifier achieving 92% accuracy. I excel at feature engineering, creating biomechanical analysis tools, and writing clean, well-documented code (147 commits, 8,500+ lines). My problem-solving skills and ability to deliver production-ready systems make me a strong candidate for roles requiring technical precision and innovation.
+            </p>
+            <h2 class="section-title">Project Overview</h2>
+            <p class="overview-text text-gray-300">
+                This project develops a biomechanics analysis system to classify cricket shots from static images using neural networks. I built the pose extraction pipeline with MediaPipe to detect 33 body landmarks, engineered a feature module to calculate 12 joint angles, and implemented a 2-layer LSTM classifier to identify four shot types (drive, pull shot, sweep, leg glance) with 92% accuracy on a 4,500+ image dataset. The system also supports visualization and feedback for coaching applications.
+            </p>
+            <a href="https://github.com/Rivier-Computer-Science/Biomechanics" class="btn btn-primary mt-3">View Project on GitHub</a>
+        </section>
+
+        <!-- Timeline -->
+        <section id="timeline" class="content-section">
+            <h1 class="section-title">Development Timeline</h1>
+            <div class="table-responsive">
+                <table class="table table-dark table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sprint</th>
+                            <th scope="col">Objective</th>
+                            <th scope="col">Key Deliverables</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sprint 1</td>
+                            <td>Minimal Viable Product</td>
+                            <td>Basic pose extraction, initial dataset collection, proof of concept</td>
+                            <td>Complete</td>
+                        </tr>
+                        <tr>
+                            <td>Sprint 2</td>
+                            <td>Infrastructure Spike</td>
+                            <td>MediaPipe integration, data pipeline setup, feature extraction framework</td>
+                            <td>Complete</td>
+                        </tr>
+                        <tr>
+                            <td>Sprint 3</td>
+                            <td>Model Development</td>
+                            <td>LSTM architecture implementation, training pipeline, validation metrics</td>
+                            <td>Complete</td>
+                        </tr>
+                        <tr>
+                            <td>Sprint 4</td>
+                            <td>Working MVP</td>
+                            <td>End-to-end prediction system, API development, visualization tools</td>
+                            <td>Complete</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </section>
-        
-        <!-- Sprint Objectives -->
-        <section>
-            <h2>Development Timeline</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Sprint</th>
-                        <th>Objective</th>
-                        <th>Key Deliverables</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Sprint 1</td>
-                        <td>Minimal Viable Product</td>
-                        <td>Basic pose extraction, initial dataset collection, proof of concept</td>
-                        <td>Complete</td>
-                    </tr>
-                    <tr>
-                        <td>Sprint 2</td>
-                        <td>Infrastructure Spike</td>
-                        <td>MediaPipe integration, data pipeline setup, feature extraction framework</td>
-                        <td>Complete</td>
-                    </tr>
-                    <tr>
-                        <td>Sprint 3</td>
-                        <td>Model Development</td>
-                        <td>LSTM architecture implementation, training pipeline, validation metrics</td>
-                        <td>Complete</td>
-                    </tr>
-                    <tr>
-                        <td>Sprint 4</td>
-                        <td>Working MVP</td>
-                        <td>End-to-end prediction system, API development, visualization tools</td>
-                        <td>Complete</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-        
-        <!-- Key Accomplishments -->
-        <section>
-            <h2>Technical Implementation</h2>
-            
-            <h3>My Direct Contributions</h3>
-            <div class="task-list">
-                <div class="task-item">
-                    <strong>Pose Extraction Pipeline</strong>
-                    Implemented MediaPipe integration to extract 33 body landmarks from cricket images. Handled edge cases where poses couldn't be detected and built fallback mechanisms.
-                </div>
-                <div class="task-item">
-                    <strong>Feature Engineering Module</strong>
-                    Developed JointAngleCalculator class that computes 12 critical biomechanical angles including elbow flexion, shoulder rotation, and hip angles from pose coordinates.
-                </div>
-                <div class="task-item">
-                    <strong>LSTM Classifier Architecture</strong>
-                    Designed and trained a 2-layer LSTM network with dropout regularization. Achieved 92% accuracy across four shot types after hyperparameter tuning.
-                </div>
-                <div class="task-item">
-                    <strong>Data Processing Pipeline</strong>
-                    Built automated pipeline that processes 1,200+ images per shot category, splits data into train/val/test sets, and generates performance metrics.
-                </div>
-            </div>
-            
-            <h3>Team Contributions</h3>
-            <div class="task-list">
-                <div class="task-item">
-                    <strong>Dataset Collection (Team effort)</strong>
-                    Collaborated with team to collect and organize 4,500+ cricket shot images across drive, pull shot, sweep, and leg glance categories.
-                </div>
-                <div class="task-item">
-                    <strong>API Development (Partial contribution)</strong>
-                    Assisted with Flask API endpoints for image upload and prediction. Primary work done by teammate, I integrated the model inference logic.
-                </div>
-            </div>
-        </section>
-        
-        <!-- Technical Details -->
-        <section>
-            <h2>Technical Stack & Performance</h2>
-            
-            <h3>Technologies Used</h3>
-            <div class="tech-stack">
-                <span class="tech-item">Python 3.8+</span>
-                <span class="tech-item">PyTorch</span>
-                <span class="tech-item">MediaPipe</span>
-                <span class="tech-item">OpenCV</span>
-                <span class="tech-item">NumPy</span>
-                <span class="tech-item">Pandas</span>
-                <span class="tech-item">Flask</span>
-                <span class="tech-item">Matplotlib</span>
-            </div>
-            
-            <h3>Model Performance</h3>
-            <div class="metrics">
-                <div class="metric-card">
-                    <div class="metric-value">92%</div>
-                    <div class="metric-label">Overall Accuracy</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">4,500+</div>
-                    <div class="metric-label">Training Images</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">33</div>
-                    <div class="metric-label">Pose Landmarks</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">4</div>
-                    <div class="metric-label">Shot Types</div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Code Samples -->
-        <section>
-            <h2>Code Repository & Documentation</h2>
-            
-            <div class="code-links">
-                <a href="https://github.com/Rivier-Computer-Science/Biomechanics" class="btn">View GitHub Repository</a>
-                <a href="#commits" class="btn btn-secondary">View My Commits</a>
-            </div>
-            
-            <h3>Key Files I Developed</h3>
-            <ul>
-                <li><code>src/data_collection/image_pose_extractor.py</code> - MediaPipe pose extraction implementation</li>
-                <li><code>src/feature_engineering/joint_angles.py</code> - Biomechanical angle calculations</li>
-                <li><code>src/model/multiclass_lstm_model.py</code> - LSTM classifier architecture</li>
-                <li><code>src/train_image_classifier.py</code> - Training pipeline orchestration</li>
-                <li><code>notebooks/cricket_image_classification_updated.ipynb</code> - Complete analysis notebook</li>
+
+        <!-- Implementation -->
+        <section id="implementation" class="content-section">
+            <h1 class="section-title">Technical Implementation</h1>
+            <h2 class="h4 mb-4 text-white">My Contributions</h2>
+            <ul class="list-unstyled">
+                <li class="mb-3">
+                    <strong class="text-white">Pose Extraction Pipeline:</strong>
+                    <p class="text-gray-300">Developed scripts in src/data_collection/ to integrate MediaPipe, extracting 33 body landmarks from cricket images with robust error handling.</p>
+                </li>
+                <li class="mb-3">
+                    <strong class="text-white">Feature Engineering Module:</strong>
+                    <p class="text-gray-300">Created JointAngleCalculator in src/feature_engineering/ to compute 12 biomechanical angles, such as elbow flexion and shoulder rotation.</p>
+                </li>
+                <li class="mb-3">
+                    <strong class="text-white">LSTM Classifier:</strong>
+                    <p class="text-gray-300">Designed a 2-layer LSTM network with dropout in src/model/, achieving 92% accuracy across four shot types.</p>
+                </li>
+                <li class="mb-3">
+                    <strong class="text-white">Data Processing Pipeline:</strong>
+                    <p class="text-gray-300">Built a pipeline in src/preprocessing/ to process 1,200+ images per category, automating train/validation/test splits.</p>
+                </li>
             </ul>
-            
-            <div class="commit-summary">
-                <strong>Contribution Summary:</strong> 147 commits, 8,500+ lines of code added, 25 pull requests merged
-            </div>
-        </section>
-        
-        <!-- Results Visualization -->
-        <section>
-            <h2>Results & Demonstrations</h2>
-            
-            <h3>System Capabilities</h3>
-            <ul>
-                <li>Real-time pose extraction from cricket images</li>
-                <li>Automatic classification into drive, pull shot, sweep, or leg glance</li>
-                <li>Visual overlay of detected pose landmarks</li>
-                <li>Biomechanical angle calculations for technique analysis</li>
-                <li>Batch processing for multiple images</li>
+            <h2 class="h4 mt-5 mb-4 text-white">Team Contributions</h2>
+            <ul class="list-unstyled">
+                <li class="mb-3">
+                    <strong class="text-white">Dataset Collection:</strong>
+                    <p class="text-gray-300">Collaborated on collecting 4,500+ images in data/raw/images/, covering drive, pull shot, sweep, and leg glance (team effort).</p>
+                </li>
+                <li class="mb-3">
+                    <strong class="text-white">API Development:</strong>
+                    <p class="text-gray-300">Supported Flask API development in src/inference/ for image upload and prediction (partial contribution).</p>
+                </li>
             </ul>
-            
-            <h3>Sample Output</h3>
-            <div class="screenshot">
-                <p><em>[Pose detection visualization with overlaid landmarks and joint angles]</em></p>
-                <div class="screenshot-caption">Example of pose landmark detection on a cover drive shot</div>
+        </section>
+
+        <!-- Tech Stack & Performance -->
+        <section id="stack" class="content-section">
+            <h1 class="section-title">Technical Stack & Performance</h1>
+            <h2 class="h4 mb-4 text-white">Technologies Used</h2>
+            <div class="d-flex flex-wrap gap-2 mb-5">
+                <span class="tech-tag">Python 3.8+</span>
+                <span class="tech-tag">PyTorch</span>
+                <span class="tech-tag">MediaPipe</span>
+                <span class="tech-tag">OpenCV</span>
+                <span class="tech-tag">NumPy</span>
+                <span class="tech-tag">Pandas</span>
+                <span class="tech-tag">Flask</span>
+                <span class="tech-tag">Matplotlib</span>
             </div>
-            
-            <div class="screenshot">
-                <p><em>[Confusion matrix showing 92% accuracy across 4 shot types]</em></p>
-                <div class="screenshot-caption">Model performance confusion matrix</div>
+            <h2 class="h4 mb-4 text-white">Model Performance</h2>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+                <div class="col">
+                    <div class="text-center">
+                        <div class="fs-1 fw-bold text-primary">92%</div>
+                        <div class="text-muted">Overall Accuracy</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="text-center">
+                        <div class="fs-1 fw-bold text-primary">4,500+</div>
+                        <div class="text-muted">Training Images</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="text-center">
+                        <div class="fs-1 fw-bold text-primary">33</div>
+                        <div class="text-muted">Pose Landmarks</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="text-center">
+                        <div class="fs-1 fw-bold text-primary">4</div>
+                        <div class="text-muted">Shot Types</div>
+                    </div>
+                </div>
             </div>
         </section>
-        
+
+        <!-- Code & Contributions -->
+        <section id="code" class="content-section">
+            <h1 class="section-title">Code & Contributions</h1>
+            <div class="d-flex flex-column flex-sm-row gap-3 mb-5">
+                <a href="https://github.com/Rivier-Computer-Science/Biomechanics" class="btn btn-primary">GitHub Repository</a>
+                <a class="btn btn-primary" onclick="showSection('appendix')">My Commits</a>
+            </div>
+            <h2 class="h4 mb-4 text-white">Key Files Developed</h2>
+            <ul class="list-unstyled">
+                <li class="mb-2 text-gray-300">src/data_collection/image_pose_extractor.py - MediaPipe pose extraction</li>
+                <li class="mb-2 text-gray-300">src/feature_engineering/joint_angles.py - Biomechanical angle calculations</li>
+                <li class="mb-2 text-gray-300">src/model/multiclass_lstm_model.py - LSTM classifier architecture</li>
+                <li class="mb-2 text-gray-300">src/train_image_classifier.py - Training pipeline orchestration</li>
+                <li class="mb-2 text-gray-300">notebooks/cricket_image_classification_updated.ipynb - Analysis notebook</li>
+            </ul>
+            <h2 class="h4 mb-4 mt-5 text-white">Project Structure</h2>
+            <pre class="pre-code">
+biomechanics/
+├── data/                      # Data storage directory
+│   ├── raw/                   # Raw video and image files
+│   │   └── images/            # Cricket shot images by type
+│   ├── processed/             # Processed pose data
+│   └── labeled/               # Annotated datasets
+├── src/                       # Source code
+│   ├── data_collection/       # Scripts for video/image capture and pose extraction
+│   ├── preprocessing/         # Data cleaning and preparation
+│   ├── feature_engineering/   # Joint angle calculations and feature extraction
+│   ├── model/                 # Neural network architecture and training
+│   ├── visualization/         # Visualization tools
+│   └── inference/             # Inference pipeline and feedback system
+├── notebooks/                 # Jupyter notebooks for exploration and demos
+├── tests/                     # Unit and integration tests
+├── configs/                   # Configuration files
+├── models/                    # Trained model files
+├── results/                   # Prediction results and visualizations
+├── requirements.txt           # Python dependencies
+└── README.md                  # Project documentation
+            </pre>
+            <div class="p-3 bg-dark rounded-3">
+                <strong class="d-block mb-2 text-white">Contribution Summary:</strong> 147 commits, 8,500+ lines of code added, 25 pull requests merged
+            </div>
+        </section>
+
+        <!-- Results & Visualizations -->
+        <section id="results" class="content-section">
+            <h1 class="section-title">Results & Visualizations</h1>
+            <h2 class="h4 mb-4 text-white">System Capabilities</h2>
+            <ul class="list-unstyled">
+                <li class="mb-2 text-gray-300">Classifies cricket shots (drive, pull shot, sweep, leg glance) from static images</li>
+                <li class="mb-2 text-gray-300">Extracts 33 pose landmarks using MediaPipe for biomechanical analysis</li>
+                <li class="mb-2 text-gray-300">Calculates 12 joint angles for technique evaluation</li>
+                <li class="mb-2 text-gray-300">Achieves 92% classification accuracy on 4,500+ images</li>
+                <li class="mb-2 text-gray-300">Supports visualization of pose landmarks and confusion matrices</li>
+            </ul>
+            <h2 class="h4 mb-4 mt-5 text-white">Sample Visualizations</h2>
+            <div class="row g-4">
+                <div class="col-md-6 text-center">
+                    <img src="https://iili.io/K9Rgxjt.png" alt="Pose detection visualization" class="img-fluid rounded mb-2">
+                    <p class="text-muted small">Pose landmark detection on a cover drive shot</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="https://iili.io/K9RQF7s.png" alt="Confusion matrix" class="img-fluid rounded mb-2">
+                    <p class="text-muted small">Confusion matrix showing 92% accuracy</p>
+                </div>
+            </div>
+        </section>
+
         <!-- Appendix -->
-        <section class="appendix" id="commits">
-            <h2>Appendix: Detailed Documentation</h2>
-            
-            <h3>Additional Resources</h3>
-            <ul>
-                <li><a href="#" class="appendix-link">Complete list of my 147 commits</a></li>
-                <li><a href="#" class="appendix-link">Full sprint review documents</a></li>
-                <li><a href="#" class="appendix-link">All user stories (including those not personally worked on)</a></li>
-                <li><a href="#" class="appendix-link">Detailed API documentation</a></li>
-                <li><a href="#" class="appendix-link">Model training logs and metrics</a></li>
+        <section id="appendix" class="content-section">
+            <h1 class="section-title">Appendix</h1>
+            <h2 class="h4 mb-4 text-white">Additional Resources</h2>
+            <ul class="list-unstyled">
+                <li class="mb-2"><a href="https://github.com/Rivier-Computer-Science/Biomechanics/commits/main" class="text-primary">Complete list of 147 commits</a></li>
+                <li class="mb-2"><a href="https://github.com/Rivier-Computer-Science/Biomechanics/blob/main/README_IMAGE_CLASSIFIER.md" class="text-primary">Image classifier documentation</a></li>
+                <li class="mb-2"><a href="#" class="text-primary">Sprint review documents</a></li>
+                <li class="mb-2"><a href="#" class="text-primary">All user stories (including those not personally worked on)</a></li>
+                <li class="mb-2"><a href="#" class="text-primary">Model training logs and metrics</a></li>
             </ul>
-            
-            <h3>Recent Commits (Sample)</h3>
-            <pre style="background-color: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+            <h2 class="h4 mb-4 mt-5 text-white">Recent Commits</h2>
+            <pre class="pre-code">
 feat: implement LSTM classifier for multiclass shot classification
-fix: handle pose extraction failures gracefully in batch processing  
+fix: handle pose extraction failures gracefully in batch processing
 refactor: optimize joint angle calculations for performance
 docs: add comprehensive documentation for feature engineering module
 test: add unit tests for pose extractor and angle calculator
@@ -438,11 +429,32 @@ feat: integrate confusion matrix visualization in training pipeline
             </pre>
         </section>
     </div>
-    
-    <footer>
-        <div class="container">
-            <p>© 2024 - Cricket Shot Classification Project | <a href="https://github.com/Rivier-Computer-Science/Biomechanics" style="color: #3498db;">GitHub</a></p>
-        </div>
-    </footer>
+
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelector(`#${sectionId}`).classList.add('active');
+
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`.nav-link[onclick="showSection('${sectionId}')"]`).classList.add('active');
+
+            if (window.innerWidth <= 992) {
+                document.querySelector('.sidebar').classList.remove('active');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('overview');
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
